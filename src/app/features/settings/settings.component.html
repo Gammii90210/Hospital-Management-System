@@ -1,0 +1,73 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Audit Log &amp; Settings</div>
+      <div class="page-subtitle">Compliance audit trail, role-based access, and user profile</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab() === 'audit'" (click)="activeTab.set('audit')">Audit trail</button>
+    <button class="tab" [class.active]="activeTab() === 'roles'" (click)="activeTab.set('roles')">Role switcher</button>
+    <button class="tab" [class.active]="activeTab() === 'profile'" (click)="activeTab.set('profile')">Current session</button>
+  </div>
+
+  @if (activeTab() === 'audit') {
+    <div class="card">
+      <table class="data-table">
+        <thead><tr><th>Timestamp</th><th>User</th><th>Module</th><th>Action</th></tr></thead>
+        <tbody>
+          @for (entry of store.auditLog(); track entry.id) {
+            <tr>
+              <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted);">{{ entry.timestamp }}</td>
+              <td style="font-weight:600;">{{ entry.user }}</td>
+              <td><span class="chip" [class]="moduleChip(entry.module)">{{ entry.module }}</span></td>
+              <td>{{ entry.action }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (activeTab() === 'roles') {
+    <div class="card card-pad">
+      <div class="section-title">Switch session role</div>
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">
+        Changing your role simulates how different staff members see the system. This is for demonstration — in production, roles are assigned server-side.
+      </p>
+      <div class="role-grid">
+        @for (r of roles; track r) {
+          <button class="role-card" [class.active]="store.currentUser().role === r" (click)="changeRole(r)">
+            <app-icon name="id-badge" [size]="22" [color]="store.currentUser().role === r ? '#2563EB' : '#94A3B8'" />
+            <div class="role-name">{{ r }}</div>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'profile') {
+    <div class="card card-pad">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+        <div class="avatar" [style.background]="store.currentUser().avatarColor" style="width:56px;height:56px;font-size:20px;">
+          {{ userInitials() }}
+        </div>
+        <div>
+          <h3>{{ store.currentUser().name }}</h3>
+          <div style="color:var(--text-secondary); font-size:13px;">{{ store.currentUser().role }} · BrightCare General Hospital</div>
+        </div>
+      </div>
+      <div class="section-title">System information</div>
+      <table class="data-table">
+        <tbody>
+          <tr><td style="color:var(--text-muted);">Hospital name</td><td>BrightCare General Hospital</td></tr>
+          <tr><td style="color:var(--text-muted);">Location</td><td>Abuja, FCT, Nigeria</td></tr>
+          <tr><td style="color:var(--text-muted);">HMS version</td><td>1.0.0 (Angular 19)</td></tr>
+          <tr><td style="color:var(--text-muted);">Total patients</td><td>{{ store.totalPatients() }}</td></tr>
+          <tr><td style="color:var(--text-muted);">Total staff</td><td>{{ store.staff().length }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

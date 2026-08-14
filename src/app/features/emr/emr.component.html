@@ -1,0 +1,70 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Electronic Medical Records</div>
+      <div class="page-subtitle">{{ store.emrRecords().length }} clinical records across all patients</div>
+    </div>
+  </div>
+
+  <div class="emr-layout">
+    <div class="card emr-list">
+      <div style="padding:12px;">
+        <div class="search-box">
+          <app-icon name="search" [size]="14" color="#94A3B8" />
+          <input class="input" style="border:none; padding:0;" placeholder="Search patient or diagnosis…"
+            [value]="search()" (input)="search.set($any($event.target).value)" />
+        </div>
+      </div>
+      <div class="emr-list-scroll">
+        @for (r of filtered(); track r.id) {
+          <button class="emr-list-item" [class.active]="selected()?.id === r.id" (click)="select(r.id)">
+            <div class="emr-list-name">{{ store.patientName(r.patientId) }}</div>
+            <div class="emr-list-diag">{{ r.diagnosis }}</div>
+            <div class="emr-list-date">{{ r.date }}</div>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="card card-pad emr-detail">
+      @if (selected(); as r) {
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+          <div>
+            <h3>{{ store.patientName(r.patientId) }}</h3>
+            <div class="profile-meta">{{ r.diagnosis }} · seen {{ r.date }} by {{ store.staffName(r.doctorId) }}</div>
+          </div>
+          @if (r.followUp) {
+            <span class="chip chip-info">Follow-up {{ r.followUp }}</span>
+          }
+        </div>
+
+        <div class="section-title">Clinical notes</div>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px; line-height:1.6;">{{ r.notes }}</p>
+
+        <div class="section-title">Vital signs</div>
+        <div class="vitals-grid">
+          <div class="vital-card"><div class="vital-label">Blood pressure</div><div class="vital-val">{{ r.vitals.bp }}</div></div>
+          <div class="vital-card"><div class="vital-label">Heart rate</div><div class="vital-val">{{ r.vitals.heartRate }} bpm</div></div>
+          <div class="vital-card"><div class="vital-label">Temperature</div><div class="vital-val">{{ r.vitals.temp }}°C</div></div>
+          <div class="vital-card"><div class="vital-label">Resp. rate</div><div class="vital-val">{{ r.vitals.respRate }}/min</div></div>
+          <div class="vital-card"><div class="vital-label">SpO₂</div><div class="vital-val">{{ r.vitals.spo2 }}%</div></div>
+          <div class="vital-card"><div class="vital-label">Weight</div><div class="vital-val">{{ r.vitals.weight }} kg</div></div>
+        </div>
+
+        @if (r.prescriptions.length > 0) {
+          <div class="section-title" style="margin-top:18px;">Prescriptions</div>
+          <table class="data-table">
+            <thead><tr><th>Drug</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead>
+            <tbody>
+              @for (rx of r.prescriptions; track rx.drug) {
+                <tr><td>{{ rx.drug }}</td><td>{{ rx.dosage }}</td><td>{{ rx.frequency }}</td><td>{{ rx.duration }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      } @else {
+        <div class="empty-state"><div class="empty-title">No record selected</div></div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 16px;
+}
+@media (max-width: 900px) { .reports-grid { grid-template-columns: 1fr; } }
+
+.report-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.report-bar-label { width: 120px; font-size: 12.5px; color: var(--text-secondary); flex-shrink: 0; }
+.report-bar-track { flex: 1; height: 10px; background: var(--canvas); border-radius: 999px; overflow: hidden; }
+.report-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #60A5FA); border-radius: 999px; transition: width 0.4s ease; }
+.report-bar-count { font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; min-width: 90px; }
+
+.lab-pipeline-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.pipeline-track { flex: 1; height: 8px; background: var(--canvas); border-radius: 999px; overflow: hidden; }
+.pipeline-fill { height: 100%; background: var(--clinical); border-radius: 999px; }

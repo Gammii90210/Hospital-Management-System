@@ -1,0 +1,48 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Inventory &amp; Assets</div>
+      <div class="page-subtitle">Medical equipment tracking, condition, and maintenance status</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total assets</div><div class="stat-value">{{ store.inventory().length }}</div></div>
+    <div class="stat-card"><div class="stat-label">Needing attention</div><div class="stat-value" style="color:#DC2626;">{{ needsAttention().length }}</div></div>
+    <div class="stat-card">
+      <div class="stat-label">Total items in stock</div>
+      <div class="stat-value">{{ totalItems() }}</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <select class="select" style="width:auto;" [value]="condFilter()" (change)="condFilter.set($any($event.target).value)">
+      <option value="All">All conditions</option>
+      <option value="New">New</option>
+      <option value="Good">Good</option>
+      <option value="Needs Repair">Needs Repair</option>
+      <option value="Out of Service">Out of Service</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Asset</th><th>Category</th><th>Department</th><th>Qty</th><th>Condition</th><th>Last serviced</th></tr></thead>
+      <tbody>
+        @for (a of filtered(); track a.id) {
+          <tr>
+            <td style="font-weight:600;">{{ a.name }}</td>
+            <td>{{ a.category }}</td>
+            <td>{{ a.department }}</td>
+            <td>{{ a.quantity }}</td>
+            <td><span class="chip" [class]="condChip(a.condition)">{{ a.condition }}</span></td>
+            <td>{{ a.lastServiced }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered().length === 0) {
+      <div class="empty-state"><div class="empty-title">No assets for this filter</div></div>
+    }
+  </div>
+</div>

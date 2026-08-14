@@ -1,0 +1,165 @@
+@if (patient(); as p) {
+  <div class="page">
+    <a routerLink="/patients" class="btn btn-ghost btn-sm" style="margin-bottom:14px;">
+      <app-icon name="chevron-right" [size]="14" style="transform:rotate(180deg);" /> Back to patients
+    </a>
+
+    <div class="profile-header card card-pad">
+      <div class="avatar" [style.background]="p.avatarColor" style="width:64px;height:64px;font-size:22px;">
+        {{ p.firstName[0] }}{{ p.lastName[0] }}
+      </div>
+      <div class="profile-info">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <h2>{{ p.firstName }} {{ p.lastName }}</h2>
+          <span class="chip" [class]="p.status === 'Inpatient' ? 'chip-warning' : p.status === 'Emergency' ? 'chip-critical' : 'chip-success'">{{ p.status }}</span>
+        </div>
+        <div class="profile-meta">{{ p.mrn }} · {{ age(p.dob) }} yrs · {{ p.gender }} · {{ p.bloodGroup }}</div>
+        <div class="profile-meta">{{ p.phone }} · {{ p.email }}</div>
+      </div>
+      <div class="profile-side">
+        <div class="profile-side-label">Insurance</div>
+        <div class="profile-side-val">{{ p.insuranceProvider }}</div>
+        @if (p.allergies.length > 0) {
+          <div class="profile-side-label" style="margin-top:10px;">Allergies</div>
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
+            @for (a of p.allergies; track a) {
+              <span class="chip chip-critical">{{ a }}</span>
+            }
+          </div>
+        }
+        @if (p.status !== 'Discharged') {
+          <button class="btn btn-secondary btn-sm" style="margin-top:14px; color:var(--critical); border-color:rgba(220,38,38,0.3);" (click)="openDischargeConfirm()">
+            <app-icon name="log-out" [size]="14" /> Discharge patient
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Overview</button>
+      <button class="tab" [class.active]="activeTab() === 'emr'" (click)="activeTab.set('emr')">EMR ({{ records().length }})</button>
+      <button class="tab" [class.active]="activeTab() === 'appointments'" (click)="activeTab.set('appointments')">Appointments ({{ appts().length }})</button>
+      <button class="tab" [class.active]="activeTab() === 'labs'" (click)="activeTab.set('labs')">Lab orders ({{ labs().length }})</button>
+      <button class="tab" [class.active]="activeTab() === 'billing'" (click)="activeTab.set('billing')">Billing ({{ invoices().length }})</button>
+    </div>
+
+    @if (activeTab() === 'overview') {
+      <div class="card card-pad">
+        <div class="section-title">Address</div>
+        <p style="margin-bottom:16px; color:var(--text-secondary); font-size:13px;">{{ p.address }}</p>
+        <div class="section-title">Registered on</div>
+        <p style="color:var(--text-secondary); font-size:13px;">{{ p.registeredOn }}</p>
+      </div>
+    }
+
+    @if (activeTab() === 'emr') {
+      @if (records().length === 0) {
+        <div class="card card-pad"><div class="empty-state"><div class="empty-title">No EMR records yet</div></div></div>
+      }
+      @for (r of records(); track r.id) {
+        <div class="card card-pad" style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <div style="font-weight:700;">{{ r.diagnosis }}</div>
+            <div style="font-size:12px; color:var(--text-muted);">{{ r.date }} · {{ store.staffName(r.doctorId) }}</div>
+          </div>
+          <p style="font-size:13px; color:var(--text-secondary); margin-bottom:10px;">{{ r.notes }}</p>
+          <div class="vitals-row">
+            <span class="vital">BP {{ r.vitals.bp }}</span>
+            <span class="vital">HR {{ r.vitals.heartRate }} bpm</span>
+            <span class="vital">Temp {{ r.vitals.temp }}°C</span>
+            <span class="vital">SpO₂ {{ r.vitals.spo2 }}%</span>
+            <span class="vital">Wt {{ r.vitals.weight }} kg</span>
+          </div>
+          @if (r.prescriptions.length > 0) {
+            <div class="section-title" style="margin-top:12px; font-size:13px;">Prescriptions</div>
+            @for (rx of r.prescriptions; track rx.drug) {
+              <div style="font-size:12.5px; color:var(--text-secondary);">{{ rx.drug }} · {{ rx.dosage }} · {{ rx.frequency }} · {{ rx.duration }}</div>
+            }
+          }
+        </div>
+      }
+    }
+
+    @if (activeTab() === 'appointments') {
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Time</th><th>Doctor</th><th>Department</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (a of appts(); track a.id) {
+              <tr>
+                <td>{{ a.date }}</td><td>{{ a.time }}</td><td>{{ store.staffName(a.doctorId) }}</td>
+                <td>{{ a.department }}</td><td>{{ a.type }}</td>
+                <td><span class="chip" [class]="statusChip(a.status)">{{ a.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (activeTab() === 'labs') {
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Test</th><th>Ordered by</th><th>Date</th><th>Priority</th><th>Status</th><th>Result</th></tr></thead>
+          <tbody>
+            @for (l of labs(); track l.id) {
+              <tr>
+                <td>{{ l.testName }}</td><td>{{ store.staffName(l.orderedBy) }}</td><td>{{ l.orderedOn }}</td>
+                <td><span class="chip" [class]="l.priority === 'STAT' ? 'chip-critical' : 'chip-neutral'">{{ l.priority }}</span></td>
+                <td><span class="chip" [class]="statusChip(l.status)">{{ l.status }}</span></td>
+                <td>{{ l.result ?? '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (activeTab() === 'billing') {
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Invoice</th><th>Date</th><th>Items</th><th>Total</th><th>Paid</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (inv of invoices(); track inv.id) {
+              <tr>
+                <td style="font-family:var(--font-mono); font-size:12px;">{{ inv.id }}</td>
+                <td>{{ inv.date }}</td>
+                <td>{{ inv.items.length }} item(s)</td>
+                <td>{{ formatCurrency(inv.total) }}</td>
+                <td>{{ formatCurrency(inv.amountPaid) }}</td>
+                <td><span class="chip" [class]="statusChip(inv.status)">{{ inv.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+  @if (showDischargeConfirm()) {
+    <div class="modal-overlay" (click)="closeDischargeConfirm()">
+      <div class="modal-panel" style="max-width:420px;" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Discharge patient</h3>
+          <button class="btn-ghost" (click)="closeDischargeConfirm()"><app-icon name="x" [size]="18" /></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.5;">
+            Are you sure you want to discharge <strong>{{ p.firstName }} {{ p.lastName }}</strong> ({{ p.mrn }})?
+            This will remove them from the active patients list. This action cannot be undone.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeDischargeConfirm()">Cancel</button>
+          <button class="btn btn-primary" style="background:var(--critical); border-color:var(--critical);" (click)="confirmDischarge()">Discharge &amp; remove</button>
+        </div>
+      </div>
+    </div>
+  }
+} @else {
+  <div class="page">
+    <div class="empty-state">
+      <div class="empty-title">Patient not found</div>
+      <a routerLink="/patients" class="btn btn-primary" style="margin-top:10px;">Back to patients</a>
+    </div>
+  </div>
+}

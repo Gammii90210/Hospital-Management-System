@@ -1,0 +1,64 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Pharmacy</div>
+      <div class="page-subtitle">Drug inventory, dispensing, and stock management</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total drug lines</div>
+      <div class="stat-value">{{ store.drugs().length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Low stock items</div>
+      <div class="stat-value" style="color:#DC2626;">{{ store.lowStockDrugs().length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Inventory value</div>
+      <div class="stat-value">{{ formatCurrency(totalValue()) }}</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <app-icon name="search" [size]="14" color="#94A3B8" />
+      <input class="input" style="border:none; padding:0;" placeholder="Search drug name or category…"
+        [value]="search()" (input)="search.set($any($event.target).value)" />
+    </div>
+    <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-secondary);">
+      <input type="checkbox" [checked]="lowStockOnly()" (change)="lowStockOnly.set($any($event.target).checked)" />
+      Low stock only
+    </label>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Drug</th><th>Category</th><th>Stock</th><th>Reorder level</th><th>Unit price</th><th>Expiry</th><th>Supplier</th><th></th></tr></thead>
+      <tbody>
+        @for (d of filtered(); track d.id) {
+          <tr>
+            <td style="font-weight:600;">{{ d.name }}</td>
+            <td>{{ d.category }}</td>
+            <td>
+              <span class="chip" [class]="stockLevel(d) === 'critical' ? 'chip-critical' : stockLevel(d) === 'low' ? 'chip-warning' : 'chip-success'">
+                {{ d.stock }} {{ d.unit }}
+              </span>
+            </td>
+            <td>{{ d.reorderLevel }}</td>
+            <td>{{ formatCurrency(d.pricePerUnit) }}</td>
+            <td>{{ d.expiryDate }}</td>
+            <td>{{ d.supplier }}</td>
+            <td>
+              <button class="btn btn-ghost btn-sm" [disabled]="d.stock === 0" (click)="dispense(d.id)">Dispense 1</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered().length === 0) {
+      <div class="empty-state"><div class="empty-title">No drugs match this search</div></div>
+    }
+  </div>
+</div>

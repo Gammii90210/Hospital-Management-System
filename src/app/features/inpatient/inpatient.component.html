@@ -1,0 +1,84 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Inpatient &amp; Bed Management</div>
+      <div class="page-subtitle">Admission, discharge, transfer, and live bed occupancy</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Occupied</div><div class="stat-value" style="color:#DC2626;">{{ summary().occupied }}</div></div>
+    <div class="stat-card"><div class="stat-label">Available</div><div class="stat-value" style="color:#16A34A;">{{ summary().available }}</div></div>
+    <div class="stat-card"><div class="stat-label">Cleaning</div><div class="stat-value" style="color:#D97706;">{{ summary().cleaning }}</div></div>
+    <div class="stat-card"><div class="stat-label">Maintenance</div><div class="stat-value" style="color:#64748B;">{{ summary().maintenance }}</div></div>
+  </div>
+
+  <div class="toolbar">
+    <select class="select" style="width:auto;" [value]="wardFilter()" (change)="wardFilter.set($any($event.target).value)">
+      <option value="All">All wards</option>
+      @for (w of wards(); track w) { <option [value]="w">{{ w }}</option> }
+    </select>
+    <div class="legend">
+      <span class="legend-item"><span class="dot bed-available"></span> Available</span>
+      <span class="legend-item"><span class="dot bed-occupied"></span> Occupied</span>
+      <span class="legend-item"><span class="dot bed-cleaning"></span> Cleaning</span>
+      <span class="legend-item"><span class="dot bed-maintenance"></span> Maintenance</span>
+    </div>
+  </div>
+
+  @for (entry of bedsByWard(); track entry[0]) {
+    <div class="card card-pad" style="margin-bottom:16px;">
+      <div class="section-title">{{ entry[0] }}</div>
+      <div class="bed-grid">
+        @for (b of entry[1]; track b.id) {
+          <button class="bed-tile" [class]="statusColor(b.status)" (click)="selectBed(b)">
+            <app-icon name="bed" [size]="16" />
+            <span class="bed-tile-label">{{ b.roomNo }}/{{ b.bedNo.replace('Bed ', 'B') }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+@if (selectedBed(); as b) {
+  <div class="modal-overlay" (click)="closePanel()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ b.ward }} · {{ b.roomNo }} / {{ b.bedNo }}</h3>
+        <button class="btn-ghost" (click)="closePanel()"><app-icon name="x" [size]="18" /></button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label">Status</label>
+          <span class="chip" [class]="statusColor(b.status)" style="display:inline-flex;">{{ b.status }}</span>
+        </div>
+        @if (b.status === 'Occupied' && b.patientId) {
+          <div class="field">
+            <label class="field-label">Patient</label>
+            <div style="font-weight:600;">{{ store.patientName(b.patientId) }}</div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label class="field-label">Admitted on</label>
+              <div>{{ b.admittedOn }}</div>
+            </div>
+            <div class="field">
+              <label class="field-label">Expected discharge</label>
+              <div>{{ b.expectedDischarge }}</div>
+            </div>
+          </div>
+        } @else {
+          <p style="font-size:13px; color:var(--text-secondary);">This bed currently has no patient assigned.</p>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (b.status === 'Occupied') {
+          <button class="btn btn-primary" (click)="dischargeBed(b)">Discharge patient</button>
+        } @else if (b.status === 'Cleaning' || b.status === 'Maintenance') {
+          <button class="btn btn-primary" (click)="markAvailable(b)">Mark as available</button>
+        }
+      </div>
+    </div>
+  </div>
+}

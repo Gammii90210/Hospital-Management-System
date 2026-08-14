@@ -1,0 +1,136 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Patients</div>
+      <div class="page-subtitle">{{ store.totalPatients() }} registered · {{ store.inpatientCount() }} currently admitted</div>
+    </div>
+    <button class="btn btn-primary" (click)="openModal()">
+      <app-icon name="plus" [size]="15" /> Register patient
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <app-icon name="search" [size]="15" color="#94A3B8" />
+      <input class="input" style="border:none; padding:0;" placeholder="Search by name, MRN, or phone…"
+        [value]="search()" (input)="search.set($any($event.target).value)" />
+    </div>
+    <select class="select" style="width:auto;" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+      <option value="All">All statuses</option>
+      <option value="Outpatient">Outpatient</option>
+      <option value="Inpatient">Inpatient</option>
+      <option value="Emergency">Emergency</option>
+      <option value="Discharged">Discharged</option>
+    </select>
+    <div style="margin-left:auto; font-size:12.5px; color:var(--text-muted);">{{ filtered().length }} results</div>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Patient</th><th>MRN</th><th>Age / Gender</th><th>Blood group</th><th>Phone</th><th>Insurance</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (p of filtered(); track p.id) {
+          <tr [routerLink]="['/patients', p.id]" style="cursor:pointer;">
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="avatar" [style.background]="p.avatarColor" style="width:32px;height:32px;">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                <span style="font-weight:600;">{{ p.firstName }} {{ p.lastName }}</span>
+              </div>
+            </td>
+            <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-secondary);">{{ p.mrn }}</td>
+            <td>{{ age(p.dob) }} yrs · {{ p.gender }}</td>
+            <td><span class="chip chip-neutral">{{ p.bloodGroup }}</span></td>
+            <td>{{ p.phone }}</td>
+            <td>{{ p.insuranceProvider }}</td>
+            <td><span class="chip" [class]="statusChip(p.status)">{{ p.status }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered().length === 0) {
+      <div class="empty-state">
+        <div class="empty-title">No patients match this search</div>
+        <p>Try a different name, MRN, or adjust the status filter.</p>
+      </div>
+    }
+  </div>
+</div>
+
+@if (showModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Register new patient</h3>
+        <button class="btn-ghost" (click)="closeModal()"><app-icon name="x" [size]="18" /></button>
+      </div>
+      <div class="modal-body">
+        <div class="two-col">
+          <div class="field">
+            <label class="field-label">First name</label>
+            <input class="input" [value]="form().firstName" (input)="updateField('firstName', $any($event.target).value)" />
+          </div>
+          <div class="field">
+            <label class="field-label">Last name</label>
+            <input class="input" [value]="form().lastName" (input)="updateField('lastName', $any($event.target).value)" />
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label class="field-label">Gender</label>
+            <select class="select" [value]="form().gender" (change)="updateField('gender', $any($event.target).value)">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Date of birth</label>
+            <input class="input" type="date" [value]="form().dob" (input)="updateField('dob', $any($event.target).value)" />
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label class="field-label">Phone</label>
+            <input class="input" [value]="form().phone" (input)="updateField('phone', $any($event.target).value)" placeholder="+234 800 000 0000" />
+          </div>
+          <div class="field">
+            <label class="field-label">Email</label>
+            <input class="input" [value]="form().email" (input)="updateField('email', $any($event.target).value)" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Address</label>
+          <input class="input" [value]="form().address" (input)="updateField('address', $any($event.target).value)" />
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label class="field-label">Blood group</label>
+            <select class="select" [value]="form().bloodGroup" (change)="updateField('bloodGroup', $any($event.target).value)">
+              @for (bg of ['A+','A-','B+','B-','AB+','AB-','O+','O-']; track bg) {
+                <option [value]="bg">{{ bg }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Insurance provider</label>
+            <select class="select" [value]="form().insuranceProvider" (change)="updateField('insuranceProvider', $any($event.target).value)">
+              <option>NHIS</option>
+              <option>AXA Mansard</option>
+              <option>Hygeia HMO</option>
+              <option>Reliance HMO</option>
+              <option>Self-pay</option>
+            </select>
+          </div>
+        </div>
+        @if (formError()) {
+          <div class="form-error">{{ formError() }}</div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="submit()">Register patient</button>
+      </div>
+    </div>
+  </div>
+}

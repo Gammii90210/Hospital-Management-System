@@ -1,0 +1,26 @@
+.portal-search { margin-bottom: 18px; max-width: 540px; }
+.portal-search-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+.search-wrap-portal {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--canvas); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+}
+.portal-results { margin-top: 8px; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.portal-result-row {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-soft);
+}
+.portal-result-row:last-child { border-bottom: none; }
+.portal-result-row:hover { background: var(--canvas); }
+
+.portal-profile { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.portal-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+
+.portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .portal-grid { grid-template-columns: 1fr; } }
+
+.portal-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border-soft);
+}
+.portal-row:last-child { border-bottom: none; }

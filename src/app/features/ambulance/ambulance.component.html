@@ -1,0 +1,57 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Ambulance &amp; Dispatch</div>
+      <div class="page-subtitle">Emergency transport, transfers, and fleet status</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Active dispatches</div><div class="stat-value" [style.color]="active().length > 0 ? '#DC2626' : '#16A34A'">{{ active().length }}</div></div>
+    <div class="stat-card"><div class="stat-label">Emergency runs</div><div class="stat-value">{{ emergencyCount() }}</div></div>
+    <div class="stat-card"><div class="stat-label">Completed today</div><div class="stat-value">{{ completed().length }}</div></div>
+  </div>
+
+  @if (active().length > 0) {
+    <div class="section-title">Active dispatches</div>
+    <div class="dispatch-grid">
+      @for (d of active(); track d.id) {
+        <div class="card card-pad dispatch-card">
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span class="chip" [class]="typeChip(d.type)">{{ d.type }}</span>
+            <span class="chip" [class]="statusChip(d.status)">{{ d.status }}</span>
+          </div>
+          <div class="dispatch-vehicle">{{ d.vehicleNo }}</div>
+          <div class="dispatch-driver">Driver: {{ d.driver }}</div>
+          <div class="dispatch-route">
+            <app-icon name="map-pin" [size]="13" color="#94A3B8" /> {{ d.pickupLocation }}
+          </div>
+          <div class="dispatch-route" style="margin-top:4px;">
+            <app-icon name="map-pin" [size]="13" color="#2563EB" /> {{ d.destination }}
+          </div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:8px;">Requested {{ d.requestedOn }}</div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="section-title" style="margin-top:22px;">All dispatches</div>
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Vehicle</th><th>Driver</th><th>Type</th><th>From</th><th>To</th><th>Status</th><th>Requested</th></tr></thead>
+      <tbody>
+        @for (d of store.ambulanceDispatches(); track d.id) {
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12px;">{{ d.vehicleNo }}</td>
+            <td>{{ d.driver }}</td>
+            <td><span class="chip" [class]="typeChip(d.type)">{{ d.type }}</span></td>
+            <td>{{ d.pickupLocation }}</td>
+            <td>{{ d.destination }}</td>
+            <td><span class="chip" [class]="statusChip(d.status)">{{ d.status }}</span></td>
+            <td>{{ d.requestedOn }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Operation Theatre</div>
+      <div class="page-subtitle">Surgery scheduling and theatre resource management</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    @for (t of theatreSummary(); track t[0]) {
+      <div class="stat-card">
+        <div class="stat-label">{{ t[0] }}</div>
+        <div class="stat-value">{{ t[1] }}</div>
+        <div class="stat-meta">total procedures</div>
+      </div>
+    }
+    <div class="stat-card">
+      <div class="stat-label">Upcoming</div>
+      <div class="stat-value">{{ scheduled().length }}</div>
+      <div class="stat-meta">scheduled / in progress</div>
+    </div>
+  </div>
+
+  <div class="section-title">Upcoming procedures</div>
+  <div class="card" style="margin-bottom:20px;">
+    <table class="data-table">
+      <thead>
+        <tr><th>Patient</th><th>Procedure</th><th>Surgeon</th><th>Theatre</th><th>Date</th><th>Start</th><th>Duration</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (b of scheduled(); track b.id) {
+          <tr>
+            <td style="font-weight:600;">{{ store.patientName(b.patientId) }}</td>
+            <td>{{ b.procedure }}</td>
+            <td>{{ store.staffName(b.surgeon) }}</td>
+            <td><span class="chip chip-neutral">{{ b.theatre }}</span></td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.startTime }}</td>
+            <td>{{ b.durationMins }} min</td>
+            <td><span class="chip" [class]="statusChip(b.status)">{{ b.status }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (scheduled().length === 0) {
+      <div class="empty-state"><div class="empty-title">No upcoming procedures scheduled</div></div>
+    }
+  </div>
+
+  <div class="section-title">Past procedures</div>
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Patient</th><th>Procedure</th><th>Surgeon</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        @for (b of past(); track b.id) {
+          <tr>
+            <td>{{ store.patientName(b.patientId) }}</td>
+            <td>{{ b.procedure }}</td>
+            <td>{{ store.staffName(b.surgeon) }}</td>
+            <td>{{ b.date }}</td>
+            <td><span class="chip" [class]="statusChip(b.status)">{{ b.status }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

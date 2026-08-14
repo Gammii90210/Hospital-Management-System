@@ -1,0 +1,81 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Reports &amp; Analytics</div>
+      <div class="page-subtitle">Hospital performance dashboards and operational insights</div>
+    </div>
+    <button class="btn btn-secondary"><app-icon name="download" [size]="15" /> Export report</button>
+  </div>
+
+  <!-- Revenue overview -->
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total invoiced</div><div class="stat-value">{{ formatCurrency(totalRevenue()) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Amount collected</div><div class="stat-value" style="color:#16A34A;">{{ formatCurrency(totalCollected()) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Collection rate</div>
+      <div class="stat-value">{{ totalRevenue() > 0 ? (totalCollected() / totalRevenue() * 100).toFixed(1) : 0 }}%</div>
+    </div>
+    <div class="stat-card"><div class="stat-label">Total patients</div><div class="stat-value">{{ store.patients().length }}</div></div>
+  </div>
+
+  <div class="reports-grid">
+    <!-- Patient status breakdown -->
+    <div class="card card-pad">
+      <div class="section-title">Patients by status</div>
+      @for (s of patientsByStatus(); track s.label) {
+        <div class="report-bar-row">
+          <div class="report-bar-label">{{ s.label }}</div>
+          <div class="report-bar-track">
+            <div class="report-bar-fill" [style.width.%]="s.pct" [style.background]="
+              s.label === 'Inpatient' ? '#D97706' :
+              s.label === 'Emergency' ? '#DC2626' :
+              s.label === 'Discharged' ? '#94A3B8' : '#16A34A'
+            "></div>
+          </div>
+          <div class="report-bar-count">{{ s.count }} ({{ s.pct }}%)</div>
+        </div>
+      }
+    </div>
+
+    <!-- Revenue by invoice status -->
+    <div class="card card-pad">
+      <div class="section-title">Revenue by invoice status</div>
+      @for (r of revenueByStatus(); track r.label) {
+        <div class="report-bar-row">
+          <div class="report-bar-label">{{ r.label }}</div>
+          <div class="report-bar-track">
+            <div class="report-bar-fill" [style.width.%]="maxBar() > 0 ? (r.amount / maxBar() * 100) : 0"></div>
+          </div>
+          <div class="report-bar-count">{{ formatCurrency(r.amount) }}</div>
+        </div>
+      }
+    </div>
+
+    <!-- Lab order pipeline -->
+    <div class="card card-pad">
+      <div class="section-title">Lab order pipeline</div>
+      @for (l of labSummary(); track l.label) {
+        <div class="lab-pipeline-row">
+          <span class="chip chip-neutral" style="min-width:120px; justify-content:center;">{{ l.label }}</span>
+          <div class="pipeline-track">
+            <div class="pipeline-fill" [style.width.%]="store.labOrders().length > 0 ? (l.count / store.labOrders().length * 100) : 0"></div>
+          </div>
+          <span style="font-size:13px; font-weight:700; min-width:28px; text-align:right;">{{ l.count }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Staff by role -->
+    <div class="card card-pad">
+      <div class="section-title">Staff composition by role</div>
+      @for (s of staffByRole(); track s.role) {
+        <div class="report-bar-row">
+          <div class="report-bar-label">{{ s.role }}</div>
+          <div class="report-bar-track">
+            <div class="report-bar-fill" style="background:var(--clinical);" [style.width.%]="store.staff().length > 0 ? (s.count / store.staff().length * 100) : 0"></div>
+          </div>
+          <div class="report-bar-count">{{ s.count }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

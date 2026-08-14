@@ -1,0 +1,62 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Laboratory</div>
+      <div class="page-subtitle">Test orders, sample tracking, and results</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Pending orders</div>
+      <div class="stat-value">{{ pending() }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">STAT priority</div>
+      <div class="stat-value" style="color:#DC2626;">{{ statCount() }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed today</div>
+      <div class="stat-value">{{ completedToday() }}</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <select class="select" style="width:auto;" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+      <option value="All">All statuses</option>
+      <option value="Ordered">Ordered</option>
+      <option value="Sample Collected">Sample Collected</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+    <div style="margin-left:auto; font-size:12.5px; color:var(--text-muted);">{{ filtered().length }} orders</div>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Test</th><th>Patient</th><th>Ordered by</th><th>Date</th><th>Priority</th><th>Status</th><th>Result</th><th></th></tr></thead>
+      <tbody>
+        @for (l of filtered(); track l.id) {
+          <tr>
+            <td style="font-weight:600;">{{ l.testName }}</td>
+            <td>{{ store.patientName(l.patientId) }}</td>
+            <td>{{ store.staffName(l.orderedBy) }}</td>
+            <td>{{ l.orderedOn }}</td>
+            <td><span class="chip" [class]="l.priority === 'STAT' ? 'chip-critical' : l.priority === 'Urgent' ? 'chip-warning' : 'chip-neutral'">{{ l.priority }}</span></td>
+            <td><span class="chip" [class]="statusChip(l.status)">{{ l.status }}</span></td>
+            <td style="max-width:200px;">{{ l.result ?? '—' }}</td>
+            <td>
+              @if (l.status !== 'Completed' && l.status !== 'Cancelled') {
+                <button class="btn btn-ghost btn-sm" (click)="advance(l)">Advance</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered().length === 0) {
+      <div class="empty-state"><div class="empty-title">No lab orders match this filter</div></div>
+    }
+  </div>
+</div>

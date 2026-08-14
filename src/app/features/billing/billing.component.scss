@@ -1,0 +1,14 @@
+.billing-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .billing-layout { grid-template-columns: 1fr; }
+}
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { width: 100px; font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
+.bar-track { flex: 1; height: 8px; background: var(--canvas); border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #60A5FA); border-radius: 999px; }
+.bar-count { font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }

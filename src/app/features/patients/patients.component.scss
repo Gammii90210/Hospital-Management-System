@@ -1,0 +1,21 @@
+.form-error {
+  margin-top: 6px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  color: var(--critical);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  width: 320px;
+}

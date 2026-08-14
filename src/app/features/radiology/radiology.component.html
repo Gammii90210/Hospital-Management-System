@@ -1,0 +1,48 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Radiology &amp; Imaging</div>
+      <div class="page-subtitle">X-Ray, CT, MRI, and Ultrasound orders</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    @for (entry of byType(); track entry[0]) {
+      <div class="stat-card">
+        <div class="stat-label">{{ entry[0] }}</div>
+        <div class="stat-value">{{ entry[1] }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="toolbar">
+    <select class="select" style="width:auto;" [value]="scanFilter()" (change)="scanFilter.set($any($event.target).value)">
+      <option value="All">All scan types</option>
+      <option value="X-Ray">X-Ray</option>
+      <option value="MRI">MRI</option>
+      <option value="CT Scan">CT Scan</option>
+      <option value="Ultrasound">Ultrasound</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Patient</th><th>Scan type</th><th>Ordered by</th><th>Scheduled</th><th>Status</th><th>Findings</th></tr></thead>
+      <tbody>
+        @for (r of filtered(); track r.id) {
+          <tr>
+            <td style="font-weight:600;">{{ store.patientName(r.patientId) }}</td>
+            <td><span class="chip chip-info">{{ r.scanType }}</span></td>
+            <td>{{ store.staffName(r.orderedBy) }}</td>
+            <td>{{ r.scheduledOn }}</td>
+            <td><span class="chip" [class]="statusChip(r.status)">{{ r.status }}</span></td>
+            <td style="max-width:240px;">{{ r.findings ?? '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered().length === 0) {
+      <div class="empty-state"><div class="empty-title">No radiology orders for this filter</div></div>
+    }
+  </div>
+</div>

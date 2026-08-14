@@ -1,0 +1,50 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Insurance &amp; Claims</div>
+      <div class="page-subtitle">Eligibility verification, claims processing, and approvals</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total claimed</div><div class="stat-value">{{ formatCurrency(totalClaimed()) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Total approved</div><div class="stat-value" style="color:#16A34A;">{{ formatCurrency(totalApproved()) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Under review / pending</div><div class="stat-value" style="color:#D97706;">{{ pendingCount() }}</div></div>
+    <div class="stat-card"><div class="stat-label">Total claims</div><div class="stat-value">{{ store.claims().length }}</div></div>
+  </div>
+
+  <div class="toolbar">
+    <select class="select" style="width:auto;" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+      <option value="All">All statuses</option>
+      <option value="Submitted">Submitted</option>
+      <option value="Under Review">Under Review</option>
+      <option value="Approved">Approved</option>
+      <option value="Rejected">Rejected</option>
+      <option value="Paid">Paid</option>
+    </select>
+    <div style="margin-left:auto; font-size:12.5px; color:var(--text-muted);">{{ filtered().length }} claims</div>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Claim ID</th><th>Patient</th><th>Provider</th><th>Invoice</th><th>Claimed</th><th>Approved</th><th>Status</th><th>Submitted</th></tr></thead>
+      <tbody>
+        @for (c of filtered(); track c.id) {
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12px;">{{ c.id }}</td>
+            <td style="font-weight:600;">{{ store.patientName(c.patientId) }}</td>
+            <td>{{ c.provider }}</td>
+            <td style="font-family:var(--font-mono); font-size:12px;">{{ c.invoiceId }}</td>
+            <td>{{ formatCurrency(c.amountClaimed) }}</td>
+            <td>{{ c.amountApproved > 0 ? formatCurrency(c.amountApproved) : '—' }}</td>
+            <td><span class="chip" [class]="statusChip(c.status)">{{ c.status }}</span></td>
+            <td>{{ c.submittedOn }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filtered().length === 0) {
+      <div class="empty-state"><div class="empty-title">No claims for this status</div></div>
+    }
+  </div>
+</div>

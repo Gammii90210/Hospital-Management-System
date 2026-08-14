@@ -1,0 +1,46 @@
+.emr-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .emr-layout { grid-template-columns: 1fr; }
+}
+
+.emr-list { max-height: 76vh; display: flex; flex-direction: column; }
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--canvas); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 10px;
+}
+.emr-list-scroll { overflow-y: auto; flex: 1; }
+
+.emr-list-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-soft);
+}
+.emr-list-item:hover { background: var(--canvas); }
+.emr-list-item.active { background: var(--primary-soft); border-left: 3px solid var(--primary); }
+.emr-list-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.emr-list-diag { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.emr-list-date { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+.emr-detail { min-height: 76vh; }
+.profile-meta { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
+
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.vital-card {
+  background: var(--clinical-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.vital-label { font-size: 11px; color: #0F766E; font-weight: 600; }
+.vital-val { font-size: 16px; font-weight: 800; color: var(--ink); margin-top: 2px; }

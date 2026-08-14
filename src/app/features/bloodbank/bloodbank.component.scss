@@ -1,0 +1,18 @@
+.blood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+.blood-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 12px;
+  text-align: center;
+  border-top: 4px solid var(--success);
+}
+.blood-card.blood-low { border-top-color: var(--warning); background: var(--warning-soft); }
+.blood-card.blood-empty { border-top-color: var(--critical); background: var(--critical-soft); }
+.blood-group { font-size: 22px; font-weight: 800; color: var(--ink); }
+.blood-count { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.blood-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }

@@ -1,0 +1,65 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Blood Bank</div>
+      <div class="page-subtitle">Inventory tracking by blood group, donor records, and reservation</div>
+    </div>
+  </div>
+
+  <div class="blood-grid">
+    @for (item of summaryByGroup(); track item.bg) {
+      <div class="blood-card" [class.blood-low]="item.count <= 2" [class.blood-empty]="item.count === 0">
+        <div class="blood-group">{{ item.bg }}</div>
+        <div class="blood-count">{{ item.count }}</div>
+        <div class="blood-label">units available</div>
+      </div>
+    }
+  </div>
+
+  <div class="section-title" style="margin-top:22px;">Available units</div>
+  <div class="card" style="margin-bottom:18px;">
+    <table class="data-table">
+      <thead><tr><th>Unit ID</th><th>Blood group</th><th>Donor</th><th>Collected</th><th>Expiry</th><th>Status</th></tr></thead>
+      <tbody>
+        @for (u of available(); track u.id) {
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12px;">{{ u.id }}</td>
+            <td><span class="chip chip-critical" style="font-size:13px; font-weight:800;">{{ u.bloodGroup }}</span></td>
+            <td>{{ u.donorName ?? 'Anonymous' }}</td>
+            <td>{{ u.collectedOn }}</td>
+            <td>
+              <span [class]="isExpired(u.expiryDate) ? 'chip chip-critical' : isExpiringSoon(u.expiryDate) ? 'chip chip-warning' : 'chip chip-neutral'">
+                {{ u.expiryDate }}
+              </span>
+            </td>
+            <td><span class="chip chip-success">Available</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (available().length === 0) {
+      <div class="empty-state"><div class="empty-title">No available blood units</div></div>
+    }
+  </div>
+
+  <div class="section-title">Reserved units</div>
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Unit ID</th><th>Blood group</th><th>Collected</th><th>Expiry</th><th>Status</th></tr></thead>
+      <tbody>
+        @for (u of reserved(); track u.id) {
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12px;">{{ u.id }}</td>
+            <td><span class="chip chip-critical" style="font-weight:800;">{{ u.bloodGroup }}</span></td>
+            <td>{{ u.collectedOn }}</td>
+            <td>{{ u.expiryDate }}</td>
+            <td><span class="chip chip-warning">Reserved</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (reserved().length === 0) {
+      <div class="empty-state" style="padding:24px;"><div class="empty-title">No reserved units</div></div>
+    }
+  </div>
+</div>

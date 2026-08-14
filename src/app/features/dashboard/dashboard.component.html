@@ -1,0 +1,146 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Good morning, {{ store.currentUser().name.split(' ')[1] || store.currentUser().name }}</div>
+      <div class="page-subtitle">Here's what's happening across BrightCare today.</div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <a routerLink="/appointments" class="btn btn-secondary">
+        <app-icon name="calendar" [size]="15" /> View schedule
+      </a>
+      <a routerLink="/patients" class="btn btn-primary">
+        <app-icon name="plus" [size]="15" /> Register patient
+      </a>
+    </div>
+  </div>
+
+  <!-- Top metrics -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total patients <app-icon name="users" [size]="14" color="#94A3B8" /></div>
+      <div class="stat-value">{{ store.totalPatients() }}</div>
+      <div class="stat-meta">{{ store.inpatientCount() }} currently admitted</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Bed occupancy <app-icon name="bed" [size]="14" color="#94A3B8" /></div>
+      <div class="stat-value">{{ store.bedOccupancy().pct }}%</div>
+      <div class="stat-meta">{{ store.bedOccupancy().occupied }} of {{ store.bedOccupancy().total }} beds occupied</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today's revenue <app-icon name="trending-up" [size]="14" color="#94A3B8" /></div>
+      <div class="stat-value">{{ formatCurrency(store.todayRevenue()) }}</div>
+      <div class="stat-meta">{{ formatCurrency(store.outstandingBalance()) }} outstanding overall</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending lab orders <app-icon name="flask" [size]="14" color="#94A3B8" /></div>
+      <div class="stat-value">{{ store.pendingLabOrders() }}</div>
+      <div class="stat-meta">{{ criticalLabs().length }} marked STAT priority</div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <!-- Left column -->
+    <div class="dash-col">
+      <div class="card card-pad">
+        <div class="section-title">Today's appointments</div>
+        @if (recentAppointments().length === 0) {
+          <div class="empty-state">
+            <div class="empty-title">No appointments today</div>
+            <p>The schedule is clear — check back tomorrow or view the full calendar.</p>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr><th>Time</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              @for (a of recentAppointments(); track a.id) {
+                <tr>
+                  <td>{{ a.time }}</td>
+                  <td>{{ store.patientName(a.patientId) }}</td>
+                  <td>{{ store.staffName(a.doctorId) }}</td>
+                  <td>{{ a.department }}</td>
+                  <td><span class="chip" [class]="statusChipClass(a.status)">{{ a.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        <a routerLink="/appointments" class="btn btn-ghost btn-sm" style="margin-top:10px;">
+          View all appointments <app-icon name="chevron-right" [size]="14" />
+        </a>
+      </div>
+
+      <div class="card card-pad" style="margin-top:18px;">
+        <div class="section-title">Department load this period</div>
+        <div class="bar-list">
+          @for (d of departmentLoad(); track d.dept) {
+            <div class="bar-row">
+              <div class="bar-label">{{ d.dept }}</div>
+              <div class="bar-track">
+                <div class="bar-fill" [style.width.%]="d.pct"></div>
+              </div>
+              <div class="bar-count">{{ d.count }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="dash-col">
+      <div class="card card-pad">
+        <div class="section-title">Critical lab orders</div>
+        @if (criticalLabs().length === 0) {
+          <div class="empty-state" style="padding:24px;">
+            <app-icon name="check" [size]="22" color="#16A34A" />
+            <div class="empty-title" style="margin-top:8px;">No STAT orders pending</div>
+          </div>
+        } @else {
+          @for (l of criticalLabs(); track l.id) {
+            <div class="mini-row">
+              <span class="chip chip-critical">STAT</span>
+              <div class="mini-row-body">
+                <div class="mini-row-title">{{ l.testName }}</div>
+                <div class="mini-row-sub">{{ store.patientName(l.patientId) }}</div>
+              </div>
+            </div>
+          }
+        }
+        <a routerLink="/laboratory" class="btn btn-ghost btn-sm" style="margin-top:6px;">
+          Open laboratory <app-icon name="chevron-right" [size]="14" />
+        </a>
+      </div>
+
+      <div class="card card-pad" style="margin-top:18px;">
+        <div class="section-title">Recent admissions</div>
+        @for (b of recentAdmissions(); track b.id) {
+          <div class="mini-row">
+            <div class="avatar" style="background:#0D9488;width:30px;height:30px;">
+              <app-icon name="bed" [size]="14" color="#fff" />
+            </div>
+            <div class="mini-row-body">
+              <div class="mini-row-title">{{ b.patientId ? store.patientName(b.patientId) : 'Unassigned' }}</div>
+              <div class="mini-row-sub">{{ b.ward }} · {{ b.roomNo }}/{{ b.bedNo }}</div>
+            </div>
+          </div>
+        }
+        <a routerLink="/inpatient" class="btn btn-ghost btn-sm" style="margin-top:6px;">
+          Manage beds <app-icon name="chevron-right" [size]="14" />
+        </a>
+      </div>
+
+      <div class="card card-pad" style="margin-top:18px;">
+        <div class="section-title">Revenue, last 7 days</div>
+        <div class="rev-chart">
+          @for (d of weeklyRevenue(); track d.day) {
+            <div class="rev-bar-wrap">
+              <div class="rev-bar" [style.height.%]="d.pct"></div>
+              <div class="rev-day">{{ d.day }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

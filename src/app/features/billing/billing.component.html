@@ -1,0 +1,99 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Billing &amp; Invoicing</div>
+      <div class="page-subtitle">Charges, payments, and revenue by department</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total collected</div><div class="stat-value">{{ formatCurrency(totalRevenue()) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Outstanding balance</div><div class="stat-value" style="color:#D97706;">{{ formatCurrency(totalOutstanding()) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Overdue invoices</div><div class="stat-value" style="color:#DC2626;">{{ overdueCount() }}</div></div>
+  </div>
+
+  <div class="billing-layout">
+    <div>
+      <div class="toolbar">
+        <select class="select" style="width:auto;" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+          <option value="All">All statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Partially Paid">Partially Paid</option>
+          <option value="Overdue">Overdue</option>
+          <option value="Insurance Claim">Insurance Claim</option>
+        </select>
+        <div style="margin-left:auto; font-size:12.5px; color:var(--text-muted);">{{ filtered().length }} invoices</div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Invoice</th><th>Patient</th><th>Date</th><th>Total</th><th>Paid</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            @for (inv of filtered(); track inv.id) {
+              <tr>
+                <td style="font-family:var(--font-mono); font-size:12px;">{{ inv.id }}</td>
+                <td style="font-weight:600;">{{ store.patientName(inv.patientId) }}</td>
+                <td>{{ inv.date }}</td>
+                <td>{{ formatCurrency(inv.total) }}</td>
+                <td>{{ formatCurrency(inv.amountPaid) }}</td>
+                <td><span class="chip" [class]="statusChip(inv.status)">{{ inv.status }}</span></td>
+                <td><button class="btn btn-ghost btn-sm" (click)="view(inv)">View</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="section-title">Revenue by category</div>
+      @for (c of revenueByCategory(); track c.cat) {
+        <div class="bar-row" style="margin-bottom:12px;">
+          <div class="bar-label">{{ c.cat }}</div>
+          <div class="bar-track"><div class="bar-fill" [style.width.%]="c.pct"></div></div>
+          <div class="bar-count" style="width:auto; font-size:11.5px;">{{ formatCurrency(c.amt) }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (selected(); as inv) {
+  <div class="modal-overlay" (click)="close()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Invoice {{ inv.id }}</h3>
+        <button class="btn-ghost" (click)="close()"><app-icon name="x" [size]="18" /></button>
+      </div>
+      <div class="modal-body">
+        <div class="two-col" style="margin-bottom:16px;">
+          <div>
+            <div class="field-label">Patient</div>
+            <div style="font-weight:600;">{{ store.patientName(inv.patientId) }}</div>
+          </div>
+          <div>
+            <div class="field-label">Date</div>
+            <div>{{ inv.date }}</div>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Description</th><th>Category</th><th>Amount</th></tr></thead>
+          <tbody>
+            @for (item of inv.items; track item.description) {
+              <tr><td>{{ item.description }}</td><td>{{ item.category }}</td><td>{{ formatCurrency(item.amount) }}</td></tr>
+            }
+          </tbody>
+        </table>
+        <div style="display:flex; justify-content:flex-end; gap:24px; margin-top:14px; font-size:13px;">
+          <div>Total: <strong>{{ formatCurrency(inv.total) }}</strong></div>
+          <div>Paid: <strong>{{ formatCurrency(inv.amountPaid) }}</strong></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        @if (inv.status !== 'Paid') {
+          <button class="btn btn-primary" (click)="markPaid(inv.id)">Mark as paid</button>
+        }
+      </div>
+    </div>
+  </div>
+}

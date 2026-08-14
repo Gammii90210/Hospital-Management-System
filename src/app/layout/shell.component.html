@@ -1,0 +1,153 @@
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <app-icon name="activity" [size]="20" color="#fff" />
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">BrightCare</div>
+        <div class="brand-sub">Hospital OS</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      @for (group of navGroups; track group) {
+        <div class="nav-group">
+          <div class="nav-group-label">{{ group }}</div>
+          @for (item of itemsForGroup(group); track item.path) {
+            <a
+              class="nav-item"
+              [routerLink]="item.path"
+              routerLinkActive="active"
+            >
+              <app-icon [name]="item.icon" [size]="17" />
+              <span>{{ item.label }}</span>
+            </a>
+          }
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main column -->
+  <div class="main-col">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="search-wrap">
+        <app-icon name="search" [size]="16" color="#94A3B8" />
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Search patients by name, MRN, or phone…"
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+        />
+        @if (searchResults().length > 0) {
+          <div class="search-results">
+            @for (p of searchResults(); track p.id) {
+              <a class="search-result-row" [routerLink]="['/patients', p.id]" (click)="searchQuery.set('')">
+                <div class="avatar" [style.background]="p.avatarColor" style="width:28px;height:28px;font-size:11px;">
+                  {{ p.firstName[0] }}{{ p.lastName[0] }}
+                </div>
+                <div class="search-result-info">
+                  <div class="search-result-name">{{ p.firstName }} {{ p.lastName }}</div>
+                  <div class="search-result-meta">{{ p.mrn }} · {{ p.phone }}</div>
+                </div>
+                <span class="chip" [class]="p.status === 'Inpatient' ? 'chip-warning' : p.status === 'Emergency' ? 'chip-critical' : 'chip-neutral'">{{ p.status }}</span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="topbar-actions">
+        <div class="popover-wrap">
+          <button class="icon-btn" (click)="toggleNotif()" aria-label="Notifications">
+            <app-icon name="bell" [size]="18" />
+            @if (store.unreadNotificationCount() > 0) {
+              <span class="notif-dot">{{ store.unreadNotificationCount() }}</span>
+            }
+          </button>
+          @if (notifOpen()) {
+            <div class="popover notif-popover">
+              <div class="popover-title">Notifications</div>
+              @for (n of store.notifications(); track n.id) {
+                <button class="notif-row" (click)="store.markNotificationRead(n.id)">
+                  <span class="notif-dot-color" [class]="'dot-' + n.type"></span>
+                  <div class="notif-row-body">
+                    <div class="notif-row-title" [class.unread]="!n.read">{{ n.title }}</div>
+                    <div class="notif-row-msg">{{ n.message }}</div>
+                    <div class="notif-row-time">{{ n.timestamp }}</div>
+                  </div>
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="popover-wrap">
+          <button class="user-pill" (click)="toggleUserMenu()">
+            <div class="avatar" [style.background]="store.currentUser().avatarColor" style="width:30px;height:30px;">
+              {{ userInitials() }}
+            </div>
+            <div class="user-pill-text">
+              <div class="user-pill-name">{{ store.currentUser().name }}</div>
+              <div class="user-pill-role">{{ store.currentUser().role }}</div>
+            </div>
+            <app-icon name="chevron-down" [size]="14" color="#94A3B8" />
+          </button>
+          @if (userMenuOpen()) {
+            <div class="popover user-popover">
+              <a routerLink="/settings" class="popover-link" (click)="userMenuOpen.set(false)">
+                <app-icon name="settings" [size]="15" /> Audit &amp; settings
+              </a>
+              <button class="popover-link">
+                <app-icon name="log-out" [size]="15" /> Sign out
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Live census strip -->
+    <div class="census-strip">
+      <div class="census-item">
+        <app-icon name="bed" [size]="14" color="#0D9488" />
+        <span class="census-label">Bed occupancy</span>
+        <span class="census-value">{{ censusOccupancy.occupied }}/{{ censusOccupancy.total }}</span>
+        <span class="census-pct">({{ censusOccupancy.pct }}%)</span>
+      </div>
+      <div class="census-divider"></div>
+      <div class="census-item">
+        <app-icon name="calendar" [size]="14" color="#2563EB" />
+        <span class="census-label">Today's appointments</span>
+        <span class="census-value">{{ todaysApptCount }}</span>
+      </div>
+      <div class="census-divider"></div>
+      <div class="census-item">
+        <app-icon name="flask" [size]="14" color="#D97706" />
+        <span class="census-label">Pending lab orders</span>
+        <span class="census-value">{{ pendingLabs }}</span>
+      </div>
+      <div class="census-divider"></div>
+      <div class="census-item">
+        @if (lowStock > 0) {
+          <app-icon name="alert-triangle" [size]="14" color="#DC2626" />
+          <span class="census-label">Low stock items</span>
+          <span class="census-value" style="color:#DC2626;">{{ lowStock }}</span>
+        } @else {
+          <app-icon name="check" [size]="14" color="#16A34A" />
+          <span class="census-label">Pharmacy stock</span>
+          <span class="census-value" style="color:#16A34A;">Healthy</span>
+        }
+      </div>
+    </div>
+
+    <!-- Routed content -->
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
