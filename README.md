@@ -5,7 +5,7 @@
 **A full-featured Hospital Management System UI built with Angular 19.**
 Clean clinical design · Reactive signals · Zero third-party UI libraries
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-5b50d6?style=for-the-badge)](https://your-live-url.github.io/brightcare-hms)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-5b50d6?style=for-the-badge)](https://gammii90210.github.io/Hospital-Management-System/)
 [![Angular](https://img.shields.io/badge/Angular-19-DD0031?style=for-the-badge&logo=angular)](https://angular.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-Educational-orange?style=for-the-badge)](#)
