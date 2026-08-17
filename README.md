@@ -53,7 +53,7 @@ The app features a persistent sidebar + top navigation shell, a live "census str
 
 ### Patients — Registry & Search
 
-![Patients list](screenshots/patients-list.png)
+![Patients list](HMS-PATIENTS.png)
 
 The **Patients** module lists every registered patient with avatar, MRN, age/gender, blood group, phone, insurance provider, and a colour-coded status chip (**Outpatient**, **Inpatient**, **Emergency**, **Discharged**). A search box filters by name, MRN, or phone, alongside a status dropdown, with a live result count. The header shows a running total of registered vs. currently admitted patients.
 
@@ -61,7 +61,7 @@ The **Patients** module lists every registered patient with avatar, MRN, age/gen
 
 ### Register New Patient
 
-![Register patient modal](screenshots/register-patient.png)
+![Register patient modal](HMS-RGISTER.png)
 
 The **Register patient** modal captures first/last name, gender, date of birth, phone, email, address, blood group, and insurance provider. On submit, the patient is instantly created with an auto-generated MRN and appears at the top of the patients table — no page reload required.
 
@@ -69,7 +69,7 @@ The **Register patient** modal captures first/last name, gender, date of birth, 
 
 ### Patient Profile — Overview, EMR, Appointments, Labs, Billing
 
-![Patient detail](screenshots/patient-detail.png)
+![Patient detail](HMS-PATIENTPROFILE.png)
 
 Clicking a patient opens a dedicated profile with a tabbed view:
 
@@ -85,7 +85,7 @@ Each patient can be **discharged** directly from their profile via a confirmatio
 
 ### Dashboard — Hospital at a Glance
 
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](HMS-DASHBOARD.png)
 
 The **Dashboard** greets the logged-in user and surfaces the day's key metrics in four summary cards — total patients, bed occupancy, today's revenue, and pending lab orders — followed by a live **Today's appointments** table and a **Critical lab orders** panel highlighting STAT-priority tests.
 
@@ -93,7 +93,7 @@ The **Dashboard** greets the logged-in user and surfaces the day's key metrics i
 
 ### Electronic Medical Records (EMR)
 
-![EMR](screenshots/emr.png)
+![EMR](HMS-EMR.png)
 
 The **EMR** module lists all clinical records with a searchable patient/diagnosis list on the left. Selecting a record reveals the diagnosis, attending doctor, visit date, follow-up date, free-text clinical notes, a full **vital signs** grid (blood pressure, heart rate, temperature, respiratory rate, SpO₂, weight), and any prescriptions issued.
 
@@ -101,7 +101,7 @@ The **EMR** module lists all clinical records with a searchable patient/diagnosi
 
 ### Laboratory — Orders & Results
 
-![Laboratory](screenshots/laboratory.png)
+![Laboratory](HMS-LAB.png)
 
 The **Laboratory** module tracks pending orders, STAT-priority counts, and orders completed today. The order table lists the test, patient, ordering doctor, date, priority, status (Ordered, In Progress, Completed, Cancelled), and result — filterable by status.
 
@@ -109,7 +109,7 @@ The **Laboratory** module tracks pending orders, STAT-priority counts, and order
 
 ### HR & Staff
 
-![HR & Staff](screenshots/hr-staff.png)
+![HR & Staff](HMS-HR&STAFF.png)
 
 The **HR & Staff** module summarises total staff, how many are currently on duty, and monthly payroll, then lists every staff member with role, department, specialty, shift, duty status, and salary — searchable by name or department and filterable by role.
 
@@ -117,7 +117,7 @@ The **HR & Staff** module summarises total staff, how many are currently on duty
 
 ### Billing & Invoicing
 
-![Billing](screenshots/billing.png)
+![Billing](HMS-BILLING.png)
 
 The **Billing & Invoicing** module shows total collected, outstanding balance, and overdue invoice count at a glance, an invoice table (patient, date, total, amount paid, status), and a **Revenue by category** breakdown across procedures, radiology, room charges, lab, consultations, and pharmacy.
 
